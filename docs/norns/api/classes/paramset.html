@@ -91,8 +91,12 @@
 	<td class="summary">constructor.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#ParamSet:add_separator">ParamSet:add_separator ()</a></td>
+	<td class="name" nowrap><a href="#ParamSet:add_separator">ParamSet:add_separator (name)</a></td>
 	<td class="summary">add separator.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ParamSet:add_group">ParamSet:add_group (name, n)</a></td>
+	<td class="summary">add group.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#ParamSet:add">ParamSet:add (args)</a></td>
@@ -115,6 +119,10 @@
 	<td class="summary">add file.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#ParamSet:add_text">ParamSet:add_text (id, name, txt)</a></td>
+	<td class="summary">add text.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#ParamSet:add_taper">ParamSet:add_taper (id, name, min, max, default, k, units)</a></td>
 	<td class="summary">add taper.</td>
 	</tr>
@@ -125,6 +133,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#ParamSet:print">ParamSet:print ()</a></td>
 	<td class="summary">print.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ParamSet:get_id">ParamSet:get_id (index)</a></td>
+	<td class="summary">id.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#ParamSet:string">ParamSet:string (index)</a></td>
@@ -157,6 +169,22 @@
 	<tr>
 	<td class="name" nowrap><a href="#ParamSet:t">ParamSet:t (index)</a></td>
 	<td class="summary">get type.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ParamSet:get_range">ParamSet:get_range (index)</a></td>
+	<td class="summary">get range</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ParamSet:hide">ParamSet:hide (index)</a></td>
+	<td class="summary">set visibility to hidden.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ParamSet:show">ParamSet:show (index)</a></td>
+	<td class="summary">set visiblility to show.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ParamSet:visible">ParamSet:visible (index)</a></td>
+	<td class="summary">get visibility.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#ParamSet:write">ParamSet:write (filename)</a></td>
@@ -214,12 +242,41 @@
 </dd>
     <dt>
     <a name = "ParamSet:add_separator"></a>
-    <strong>ParamSet:add_separator ()</strong>
+    <strong>ParamSet:add_separator (name)</strong>
     </dt>
     <dd>
     add separator.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ParamSet:add_group"></a>
+    <strong>ParamSet:add_group (name, n)</strong>
+    </dt>
+    <dd>
+    add group.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+
+        </li>
+        <li><span class="parameter">n</span>
+
+        </li>
+    </ul>
 
 
 
@@ -382,6 +439,32 @@
 
 </dd>
     <dt>
+    <a name = "ParamSet:add_text"></a>
+    <strong>ParamSet:add_text (id, name, txt)</strong>
+    </dt>
+    <dd>
+    add text.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">id</span>
+
+        </li>
+        <li><span class="parameter">name</span>
+
+        </li>
+        <li><span class="parameter">txt</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "ParamSet:add_taper"></a>
     <strong>ParamSet:add_taper (id, name, min, max, default, k, units)</strong>
     </dt>
@@ -458,6 +541,27 @@
     print.
 
 
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ParamSet:get_id"></a>
+    <strong>ParamSet:get_id (index)</strong>
+    </dt>
+    <dd>
+    id.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">number</span></span>
+
+        </li>
+    </ul>
 
 
 
@@ -647,6 +751,86 @@
 
 </dd>
     <dt>
+    <a name = "ParamSet:get_range"></a>
+    <strong>ParamSet:get_range (index)</strong>
+    </dt>
+    <dd>
+    get range
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ParamSet:hide"></a>
+    <strong>ParamSet:hide (index)</strong>
+    </dt>
+    <dd>
+    set visibility to hidden.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ParamSet:show"></a>
+    <strong>ParamSet:show (index)</strong>
+    </dt>
+    <dd>
+    set visiblility to show.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ParamSet:visible"></a>
+    <strong>ParamSet:visible (index)</strong>
+    </dt>
+    <dd>
+    get visibility.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "ParamSet:write"></a>
     <strong>ParamSet:write (filename)</strong>
     </dt>
@@ -735,7 +919,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2020-03-10 21:05:20 </i>
+<i style="float:right;">Last updated 2020-03-19 12:23:28 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
