@@ -71,8 +71,12 @@ local function param_handler(path, args)
         local param = pset:lookup_param(osc_param_id)
 
         if param.id == osc_param_id then
-          print('setting parameter '..pset_id..'/'..param.id..' to '..osc_param_value)
-          param:set(osc_param_value)
+          --print('setting parameter '..pset_id..'/'..param.id..' to '..osc_param_value..":"..param.t)
+          if param.t == 2 then
+            param:set(math.modf(osc_param_value))
+          else
+            param:set(osc_param_value)
+          end
         end
       end
     end
