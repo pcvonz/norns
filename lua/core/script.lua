@@ -2,8 +2,9 @@
 -- @classmod script
 -- @alias Script
 
-local Script = {}
+fnl = require("core/fennel")
 
+local Script = {}
 --- reset script environment.
 -- ie redirect draw, key, enc functions, stop timers, clear engine, etc.
 Script.clear = function()
@@ -106,6 +107,10 @@ Script.init = function()
   _norns.screen_save()
 end
 
+function GetFileExtension(url)
+  return url:match("^.+(%..+)$")
+end
+
 --- load a script from the /scripts folder.
 -- @tparam string filename file to load. leave blank to reload current file.
 Script.load = function(filename)
@@ -136,8 +141,13 @@ Script.load = function(filename)
   end
 
   print("# script load: " .. filename)
-
-  local f=io.open(filename,"r")
+  local f
+  if GetFileExtension(filename) == ".fnl" then
+    f=io.popen("/home/we/Fennel/fennel --require-as-include --compile "..filename, "r")
+    for line in f:lines() do print(line) end
+  else
+    f=io.open(filename,"r")
+  end
   if f==nil then
     print("file not found: "..filename)
   else
@@ -169,7 +179,12 @@ Script.load = function(filename)
       util.make_dir(norns.state.data)
     end
 
-    local status = norns.try(function() dofile(filename) end, "load fail") -- do the new script
+    local status 
+  if GetFileExtension(filename) == ".fnl" then
+    status = norns.try(function() fnl.dofile(filename) end, "load fail") -- do the new script
+  else
+    status = norns.try(function() dofile(filename) end, "load fail") -- do the new script
+  end
     if status == true then
       norns.state.save() -- remember this script for next launch
       norns.script.nointerface = redraw == norns.blank -- check if redraw is present
