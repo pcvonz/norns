@@ -265,48 +265,64 @@ static void l_print(lua_State *L) {
 
 // push and evaluate a line buffer provided by caller
 int l_handle_line(lua_State *L, char *line) {
-    // fprintf(stderr, "l_handle_line: %s \n", line);
-    size_t l;
-    int status;
-    lua_settop(L, 0);
-    l = strlen(line);
-    if ((l > 0) && (line[l - 1] == '\n')) {
-        line[--l] = '\0';
-    }
+	size_t l;
+	int status;
+	char *command = "/home/we/Fennel/compile_fennel_string.lua ";
+	char *str = (char *)malloc(sizeof(char)*(strlen(line) + strlen(command + 4))); 
+	strcpy(str, command);
+	strcat(str, "\'");
+	strcat(str, line);
+	strcat(str, "\'");
+	FILE* f = popen(str, "r");
+	if (f == NULL) {
+		fprintf(stderr, "l_handle_line: Failed at parsing fennel.");
+		exit(1);
+	}
+	char *output = NULL;
+	size_t len = 0;
+	while (getline(&output, &len, f) != -1)
+		    fputs(output, stdout);
 
-    lua_pushlstring(L, line, l);
-    // try evaluating as an expression
-    status = add_return(L);
-    if (status == LUA_OK) {
-        goto call;
-    }
-    // try as a statement, maybe with continuation
-    status = try_statement(L);
-    if (status == LUA_OK) {
-        goto call;
-    }
 
-    if (status == STATUS_INCOMPLETE) {
-        fprintf(stderr, "<incomplete>\n");
-        goto exit;
-    }
+	lua_settop(L, 0);
+	l = strlen(output);
+	if ((l > 0) && (output[l - 1] == '\n')) {
+		output[--l] = '\0';
+	}
+
+	lua_pushlstring(L, output, l);
+	// try evaluating as an expression
+	status = add_return(L);
+	if (status == LUA_OK) {
+		goto call;
+	}
+	// try as a statement, maybe with continuation
+	status = try_statement(L);
+	if (status == LUA_OK) {
+		goto call;
+	}
+
+	if (status == STATUS_INCOMPLETE) {
+		fprintf(stderr, "<incomplete>\n");
+		goto exit;
+	}
 
 call: // call the compiled function on the top of the stack
-    status = docall(L, 0, LUA_MULTRET);
-    if (status == LUA_OK) {
-        //    printf("<evaluation completed with %d stack elements>\n",
-        // lua_gettop(L));
-        if (lua_gettop(L) == 0) {
-            fprintf(stderr, "<ok>\n");
-        }
-        l_print(L);
-        fprintf(stderr, "\n");
-    } else {
-        report(L, status);
-    }
+	status = docall(L, 0, LUA_MULTRET);
+	if (status == LUA_OK) {
+		//    printf("<evaluation completed with %d stack elements>\n",
+		// lua_gettop(L));
+		if (lua_gettop(L) == 0) {
+			fprintf(stderr, "<ok>\n");
+		}
+		l_print(L);
+		fprintf(stderr, "\n");
+	} else {
+		report(L, status);
+	}
 
 exit:
-    lua_settop(L, 0); /* clear stack */
-    // caller is responsible for freeing the buffer
-    return 0;
+	lua_settop(L, 0); /* clear stack */
+	// caller is responsible for freeing the buffer
+	return 0;
 }
