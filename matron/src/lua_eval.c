@@ -31,6 +31,7 @@
 static lua_State *globalL = NULL;
 
 static const char *progname = "lua";
+extern int translate_fennel;
 
 // a stringbuilder for saving incomplete statement lines
 #define STATUS_INCOMPLETE 999
@@ -251,11 +252,9 @@ static int try_statement(lua_State *L) {
  * Evaluates fennel line
  */
 const char* fennel_translate(lua_State *L, char *line) {
-	//fprintf(stdout, "Attempting to translate lua file\n");
-	//fprintf(stdout, "Translating line %s\n", line);
 	luaL_openlibs(L);
 	luaopen_base(L);
-	if (luaL_loadfile(L, "/home/we/norns/matron/src/fennel_to_fennel.lua"))
+	if (luaL_loadfile(L, "/home/we/norns/matron/src/fennel_to_lua.lua"))
 	{
 		fprintf(stdout, "Error: \n");
 		fprintf(stdout, "%s\n", lua_tostring(L, -1));
@@ -298,20 +297,21 @@ static void l_print(lua_State *L) {
 
 // push and evaluate a line buffer provided by caller
 int l_handle_line(lua_State *L, char *line) {
-    // fprintf(stderr, "l_handle_line: %s \n", line);
-    const char *fen;
-    fen = fennel_translate(L, line);
-    fprintf(stdout, "l_handle_line: %s \n", fen);
+    if (translate_fennel == 1) {
+	    line = (char*)fennel_translate(L, line);
+    }
     
     size_t l;
     int status;
     lua_settop(L, 0);
-    l = strlen(fen);
-    //if ((l > 0) && (fen[l - 1] == '\n')) {
-    //    fen[--l] = '\0';
-    //}
+    l = strlen(line);
+    if (translate_fennel == 1) {
+	    if ((l > 0) && (line[l - 1] == '\n')) {
+		    line[--l] = '\0';
+	    }
+    }
 
-    lua_pushlstring(L, fen, l);
+    lua_pushlstring(L, line, l);
     // try evaluating as an expression
     status = add_return(L);
     if (status == LUA_OK) {

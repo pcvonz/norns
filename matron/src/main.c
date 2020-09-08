@@ -31,6 +31,7 @@
 
 #include "oracle.h"
 #include "weaver.h"
+int translate_fennel = 0;
 
 void print_version(void);
 
@@ -52,6 +53,13 @@ void cleanup(void) {
 
 int main(int argc, char **argv) {
     args_parse(argc, argv);
+    
+    for (int i = 0; i < argc; i++) {
+	fprintf(stdout, "%s\n", argv[i]);
+        if (strcmp(argv[i], "--fennel") == 0) {
+        	translate_fennel = 1;
+        }
+    }
 
     print_version();
 
