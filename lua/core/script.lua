@@ -2,8 +2,6 @@
 -- @classmod script
 -- @alias Script
 
-fnl = require("core/fennel")
-
 local Script = {}
 --- reset script environment.
 -- ie redirect draw, key, enc functions, stop timers, clear engine, etc.
@@ -178,10 +176,10 @@ Script.load = function(filename)
       print("### initializing data folder")
       util.make_dir(norns.state.data)
     end
-
     local status 
   if GetFileExtension(filename) == ".fnl" then
-    status = norns.try(function() fnl.dofile(filename) end, "load fail") -- do the new script
+    local f = require("fennel")
+    status = norns.try(function() f.dofile(filename)  end, "load fail") -- do the new script
   else
     status = norns.try(function() dofile(filename) end, "load fail") -- do the new script
   end
@@ -207,6 +205,10 @@ Script.run = function()
     engine.load("None", Script.init)
   end
   norns.pmap.read() -- load parameter map
+end
+
+function dir(obj)
+    for k, v in pairs(obj) do print(k) end
 end
 
 --- load script metadata.

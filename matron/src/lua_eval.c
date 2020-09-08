@@ -248,6 +248,39 @@ static int try_statement(lua_State *L) {
 }
 
 /*
+ * Evaluates fennel line
+ */
+const char* fennel_translate(lua_State *L, char *line) {
+	//fprintf(stdout, "Attempting to translate lua file\n");
+	//fprintf(stdout, "Translating line %s\n", line);
+	luaL_openlibs(L);
+	luaopen_base(L);
+	if (luaL_loadfile(L, "/home/we/norns/matron/src/fennel_to_fennel.lua"))
+	{
+		fprintf(stdout, "Error: \n");
+		fprintf(stdout, "%s\n", lua_tostring(L, -1));
+		return "return print(\"Couldn't translate fennel\")";
+	}
+	lua_pcall(L, 0, 0, 0);
+	fprintf(stdout, "Loaded lua file global_translate\n");
+	const char *fen;
+	lua_getglobal(L, "translate_fennel");	
+	lua_pushlstring(L, line, strlen(line));
+	/* do the call (2 arguments, 1 result) */
+	if (lua_pcall(L, 1, 1, 0)) {
+		fprintf(stderr, "Error running lua function\n");
+	}
+	if (!lua_isstring(L, -1)) {
+		fprintf(stderr, "Not a string\n");
+	}
+	fen = lua_tostring(L, -1);
+	//fprintf(stderr, "FENNEL: %s\n", fen);
+	lua_pop(L, 1);
+	return fen;
+
+}
+
+/*
 ** Prints (calling the Lua 'print' function) any values on the stack
 */
 static void l_print(lua_State *L) {
@@ -265,64 +298,52 @@ static void l_print(lua_State *L) {
 
 // push and evaluate a line buffer provided by caller
 int l_handle_line(lua_State *L, char *line) {
-	size_t l;
-	int status;
-	char *command = "/home/we/Fennel/compile_fennel_string.lua ";
-	char *str = (char *)malloc(sizeof(char)*(strlen(line) + strlen(command + 4))); 
-	strcpy(str, command);
-	strcat(str, "\'");
-	strcat(str, line);
-	strcat(str, "\'");
-	FILE* f = popen(str, "r");
-	if (f == NULL) {
-		fprintf(stderr, "l_handle_line: Failed at parsing fennel.");
-		exit(1);
-	}
-	char *output = NULL;
-	size_t len = 0;
-	while (getline(&output, &len, f) != -1)
-		    fputs(output, stdout);
+    // fprintf(stderr, "l_handle_line: %s \n", line);
+    const char *fen;
+    fen = fennel_translate(L, line);
+    fprintf(stdout, "l_handle_line: %s \n", fen);
+    
+    size_t l;
+    int status;
+    lua_settop(L, 0);
+    l = strlen(fen);
+    //if ((l > 0) && (fen[l - 1] == '\n')) {
+    //    fen[--l] = '\0';
+    //}
 
+    lua_pushlstring(L, fen, l);
+    // try evaluating as an expression
+    status = add_return(L);
+    if (status == LUA_OK) {
+        goto call;
+    }
+    // try as a statement, maybe with continuation
+    status = try_statement(L);
+    if (status == LUA_OK) {
+        goto call;
+    }
 
-	lua_settop(L, 0);
-	l = strlen(output);
-	if ((l > 0) && (output[l - 1] == '\n')) {
-		output[--l] = '\0';
-	}
-
-	lua_pushlstring(L, output, l);
-	// try evaluating as an expression
-	status = add_return(L);
-	if (status == LUA_OK) {
-		goto call;
-	}
-	// try as a statement, maybe with continuation
-	status = try_statement(L);
-	if (status == LUA_OK) {
-		goto call;
-	}
-
-	if (status == STATUS_INCOMPLETE) {
-		fprintf(stderr, "<incomplete>\n");
-		goto exit;
-	}
+    if (status == STATUS_INCOMPLETE) {
+        fprintf(stderr, "<incomplete>\n");
+        goto exit;
+    }
 
 call: // call the compiled function on the top of the stack
-	status = docall(L, 0, LUA_MULTRET);
-	if (status == LUA_OK) {
-		//    printf("<evaluation completed with %d stack elements>\n",
-		// lua_gettop(L));
-		if (lua_gettop(L) == 0) {
-			fprintf(stderr, "<ok>\n");
-		}
-		l_print(L);
-		fprintf(stderr, "\n");
-	} else {
-		report(L, status);
-	}
+    status = docall(L, 0, LUA_MULTRET);
+    if (status == LUA_OK) {
+        //    printf("<evaluation completed with %d stack elements>\n",
+        // lua_gettop(L));
+        if (lua_gettop(L) == 0) {
+            fprintf(stderr, "<ok>\n");
+        }
+        l_print(L);
+        fprintf(stderr, "\n");
+    } else {
+        report(L, status);
+    }
 
 exit:
-	lua_settop(L, 0); /* clear stack */
-	// caller is responsible for freeing the buffer
-	return 0;
+    lua_settop(L, 0); /* clear stack */
+    // caller is responsible for freeing the buffer
+    return 0;
 }
